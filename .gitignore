@@ -1,0 +1,17 @@
+# ---- Python junk ----
+__pycache__/
+*.py[cod]
+*.pyc
+.venv/
+venv/
+.env
+
+# ---- files the program generates ----
+output/
+
+# ---- editor / OS junk ----
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+.DS_Store
