@@ -1,77 +1,43 @@
-# Parallel Forces and Support Reaction Solver
+## What is this program?
 
-**Course:** Computer Fundamentals and Programming for Civil Engineering
-**Author:** [Your Name Here]
-**Stub Code:** [Your Stub Code Here]
+This program solves a beam problem from Statics.
 
-A Python program that solves parallel-force and support-reaction problems
-commonly encountered in Statics. The user enters the beam length and any
-number of vertical forces (magnitude, direction and position); the program
-calculates the two support reactions using the equations of static
-equilibrium, prints every step of the solution, verifies equilibrium and
-draws the beam diagram.
+Think of a beam like a plank. It rests on two supports (left and right).
+Forces push the beam down (or up) at different points.
+The supports push back. These pushes are called **reactions**.
 
-Two interfaces are included:
+The program does this:
 
-- **Console version** – `main.py` (typed input, printed step-by-step solution)
-- **Graphical version** – `gui.py` (tkinter window with the diagram embedded)
-
-Both versions use the _same_ calculation module (`solver.py`) and the _same_
-drawing module (`diagram.py`), so they always give identical results.
+1. Asks for the length of the beam.
+2. Asks for the forces: how big, up or down, and where on the beam.
+3. Calculates the two support reactions (R1 and R2).
+4. Shows every step of the math, not just the answer.
+5. Checks if the beam is balanced (equilibrium).
+6. Draws a picture of the beam with all forces and reactions.
 
 ---
 
-## 1. Features
+## Files in this project
 
-- Accepts the beam length and the positions of the two supports
-  (defaults: supports at 0 m and at the beam length).
-- Accepts any number of vertical forces (1–50 in console, 1–10 in GUI).
-- Each force has a **magnitude (kN)**, a **direction (upward / downward)**
-  and a **position (m)** measured from the left end of the beam.
-- Calculates the support reactions using:
-  - `Sum M = 0` about the left support -> gives the right reaction
-  - `Sum Fy = 0` -> gives the left reaction
-- Shows the full calculation (every moment, every equation), not just answers.
-- Checks equilibrium: `Sum Fy ≈ 0`, `Sum M_A ≈ 0`, `Sum M_B ≈ 0`
-  (tolerance = 0.0001).
-- Handles both upward and downward forces, and reports a negative reaction
-  (support must hold the beam down).
-- Bonus: internal shear force table along the beam.
-- Generates a beam diagram with Matplotlib **from the user's real input**:
-  beam, pin and roller supports, force arrows with labels and positions,
-  reaction arrows, support labels and the overall beam length dimension.
-  The picture is saved as `output/beam_diagram.png` (console version) and is
-  embedded in the window (GUI version).
+| File               | What it does                                          |
+| ------------------ | ----------------------------------------------------- |
+| `main.py`          | The typed version. **Run this one.**                  |
+| `gui.py`           | The window version with buttons. **Or run this one.** |
+| `forces.py`        | Asks the questions and reads your answers             |
+| `solver.py`        | Does all the math                                     |
+| `report.py`        | Prints the steps on the screen                        |
+| `diagram.py`       | Draws the beam picture                                |
+| `sample_input.txt` | Ready-made answers for a quick test                   |
+| `output/`          | Folder where the picture is saved                     |
 
 ---
 
-## 2. Project Structure
+## What you need
 
-```
-parallel_forces_solver/
-│
-├── main.py              ← RUN THIS: console version (program flow)
-├── gui.py               ← RUN THIS: graphical version (tkinter + embedded plot)
-├── forces.py            ← all user input and validation (console)
-├── solver.py            ← all statics calculations (pure math, no printing)
-├── report.py            ← formatted step-by-step printout (console)
-├── diagram.py           ← Matplotlib beam drawing (figure builder + PNG saver)
-│
-├── requirements.txt     ← project dependencies (matplotlib)
-├── sample_input.txt     ← the 20 m class example for automatic testing
-├── README.md            ← this file
-│
-└── output/              ← created automatically; holds beam_diagram.png
-```
+- Python 3
+- Matplotlib (the drawing library)
 
----
-
-## 3. Requirements
-
-- Python **3.7 or newer** (tkinter is included with Python)
-- Matplotlib
-
-Install the dependency once:
+Install it once with this command:
 
 ```
 pip install matplotlib
@@ -79,160 +45,101 @@ pip install matplotlib
 
 ---
 
-## 4. How to Run
+## How to run
 
-Open a terminal **inside the project folder**, then choose a version:
+Open a terminal inside the project folder, then:
 
-### 4.1 Console version (typed input)
+**Typed version:**
 
 ```
 python main.py
 ```
 
-### 4.2 Automatic test (no typing, uses the class example)
-
-```
-python main.py < sample_input.txt
-```
-
-### 4.3 Graphical version
+**Window version:**
 
 ```
 python gui.py
 ```
 
-GUI screens:
-
-1. **Start screen** – title, description, `Start` button, author line.
-2. **Input screen** – beam length, number of loads, `Set Loads` builds one
-   row per load (magnitude + direction dropdown + distance), support
-   positions R1/R2 (leave blank for the defaults 0 and L).
-3. **Results** – `Calculate Reactions` shows R1 and R2, the equilibrium
-   verdict and the beam diagram on the right; `Show Steps` opens the full
-   step-by-step calculation; `Back` and `Clear` reset the screen.
-
----
-
-## 5. Example Input (class problem)
-
-| Item        | Value                   |
-| ----------- | ----------------------- |
-| Beam length | 20 m                    |
-| Supports    | 0 m and 20 m (defaults) |
-| Force 1     | 5 kN downward at 4 m    |
-| Force 2     | 19 kN downward at 11 m  |
-| Force 3     | 8 kN downward at 16 m   |
-
-Console input sequence: `20`, _Enter_, _Enter_, `3`, then for each force
-`5 / 2 / 4`, `19 / 2 / 11`, `8 / 2 / 16` (direction `2` = downward),
-finally `n` to exit.
-
-### Expected result
+**Quick test (no typing needed):**
 
 ```
-Sum of applied forces      = -32.00 kN
-Sum of moments about A     = -357.00 kN.m
-RB = 357.00 / 20.00        =  17.85 kN (upward)
-RA = 32.00 - 17.85         =  14.15 kN (upward)
-Sum Fy = 0.0000  |  Sum M_A = 0.0000  |  Sum M_B = 0.0000  ->  EQUILIBRIUM OK
+python main.py < sample_input.txt
 ```
 
 ---
 
-## 6. Engineering Background
+## How to use the window version
 
-**Sign convention**
+1. Click **Start**.
+2. Type the beam length, example: `20`.
+3. Type the number of loads, example: `3`, then click **Set Loads**.
+4. Fill each row: size, direction (down or up), distance.
+5. Leave R1 and R2 empty (the program will use 0 and the beam length).
+6. Click **Calculate Reactions**.
+7. You will see R1, R2 and the beam picture.
+8. **Show Steps** = see all the math. **Clear** = erase. **Back** = start screen.
 
-| Quantity            | Positive (+)      | Negative (−) |
-| ------------------- | ----------------- | ------------ |
-| Vertical force `Fy` | upward            | downward     |
-| Moment `M`          | counter-clockwise | clockwise    |
+---
 
-**Equations of static equilibrium**
+## Example and answer
+
+Beam = 20 m long.
+Forces: 5 kN down at 4 m, 19 kN down at 11 m, 8 kN down at 16 m.
+
+The program gives:
 
 ```
-Sum Fy = 0
-Sum M  = 0
-Moment of a force about a pivot P = Fy * (x_force - x_pivot)
+R1 (left support)  = 14.15 kN up
+R2 (right support) = 17.85 kN up
+All checks = 0.0000  ->  the beam is balanced. Correct.
 ```
 
-**Solution strategy**
+---
 
-1. Take moments about support A. The left reaction passes through A
-   (lever arm = 0), so the equation contains only one unknown:
+## The math, in simple words
 
-   `RB = -(sum of moments of the loads about A) / (xB - xA)`
+Two rules keep the beam still:
 
-2. Use vertical equilibrium for the second reaction:
+- **Rule 1:** total push up = total push down. (Sum Fy = 0)
+- **Rule 2:** the beam must not turn. All turning effects must cancel. (Sum M = 0)
 
-   `RA = -(sum of applied forces) - RB`
+A turning effect is called a **moment**:
 
-3. Verify by substituting the answers back into
-   `Sum Fy`, `Sum M_A` and `Sum M_B`; all three must be ≈ 0.
+```
+Moment = Force x Distance from the point
+```
 
-A **negative reaction** means the support must pull the beam downward
-(the beam tends to lift off that support).
+Steps the program follows:
+
+1. Take moments about the left support. This finds R2 first.
+2. Use Rule 1 to find R1.
+3. Put the answers back into both rules to check. Everything must be about 0.
+
+Signs used: up = positive, down = negative.
 
 ---
 
-## 7. Testing Performed
+## Tests done
 
-| Test                | Input                                                 | Expected                         | Result |
-| ------------------- | ----------------------------------------------------- | -------------------------------- | ------ |
-| 1. Class example    | L = 20 m; 5 kN ↓ @ 4 m; 19 kN ↓ @ 11 m; 8 kN ↓ @ 16 m | RA = 14.15 kN ↑, RB = 17.85 kN ↑ | PASS   |
-| 2. Symmetric load   | L = 10 m; 10 kN ↓ @ 5 m                               | RA = RB = 5.00 kN ↑              | PASS   |
-| 3. Mixed directions | L = 10 m; 20 kN ↓ @ 3 m; 5 kN ↑ @ 8 m                 | RA = 13.00 kN ↑, RB = 2.00 kN ↑  | PASS   |
+- Test 1: the class example above -> R1 = 14.15, R2 = 17.85. Correct.
+- Test 2: 10 m beam, 10 kN in the middle -> R1 = 5, R2 = 5. Correct.
+- Test 3: 10 m beam, 20 kN down at 3 m and 5 kN up at 8 m -> R1 = 13, R2 = 2. Correct.
 
-In every test the equilibrium check returned
-`Sum Fy = 0.0000`, `Sum M_A = 0.0000`, `Sum M_B = 0.0000`, and the last row
-of the shear table closed at 0.00.
+In all tests the checks showed 0.0000, so equilibrium was OK.
 
 ---
 
-## 8. Program Flow
+## What the program cannot do
 
-1. Display the title and sign convention.
-2. Ask for the beam length.
-3. Ask for the support positions (defaults available).
-4. Ask how many forces will be entered.
-5. Loop: read magnitude, direction and position of each force.
-6. Calculate the moment of every force about support A.
-7. Solve RB from `Sum M_A = 0`, then RA from `Sum Fy = 0`.
-8. Check equilibrium (`Sum Fy`, `Sum M_A`, `Sum M_B`).
-9. Display the complete calculation and the final reactions.
-10. Generate and save/show the beam diagram.
+- Only 2 supports (not 3 or more).
+- Only vertical forces (no sideways pushes).
+- No spread-out loads. Change them into one force first.
+- The weight of the beam itself is not added automatically.
 
 ---
 
-## 9. Limitations
+## Where the picture is saved
 
-- Exactly **two supports** (three or more = statically indeterminate).
-- **Vertical point loads only** – no horizontal loads and no applied couples.
-- Distributed loads must be converted by the user into an equivalent point
-  load (`W = w * length`, placed at the centre of the loaded length).
-- Beam self-weight is not added automatically (enter it as one more
-  downward force at L/2 if needed).
-
----
-
-## 10. Possible Extensions
-
-- Automatic conversion of uniform distributed loads.
-- Shear force and bending moment diagrams plotted under the beam.
-- Export the step-by-step solution to a text file.
-- Allow movable supports in the GUI by dragging them with the mouse.
-
----
-
-## 11. File Description
-
-| File               | Purpose                                                                             |
-| ------------------ | ----------------------------------------------------------------------------------- |
-| `main.py`          | Program flow of the console version (input → math → print → diagram)                |
-| `gui.py`           | Graphical version: start screen, input screen, embedded diagram                     |
-| `forces.py`        | All `input()` calls and input validation (console)                                  |
-| `solver.py`        | Statics math only: totals, moments, reactions, equilibrium check, shear table       |
-| `report.py`        | Formatted step-by-step printing (console)                                           |
-| `diagram.py`       | `create_beam_figure()` builds the picture; `draw_beam()` saves the PNG and shows it |
-| `requirements.txt` | Lists `matplotlib`                                                                  |
-| `sample_input.txt` | Ready-made input file with the 20 m class example                                   |
+- Typed version: `output/beam_diagram.png`
+- Window version: shown inside the window.
