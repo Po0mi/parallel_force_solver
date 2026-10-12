@@ -27,13 +27,19 @@ import diagram
 
 # ------------------------------------------------------------------ appearance
 WINDOW_TITLE = "Reaction Solver with Diagram"
-BG_COLOR   = "#dff0ee"      # light mint background (like the example)
-BOX_COLOR  = "#a9d7b8"      # light green boxes on the start screen
-BUTTON_BG  = "#2e8b57"      # green buttons
-BUTTON_FG  = "white"
+BG_COLOR    = "#e8f4f0"     # soft mint page background
+CARD_BG     = "#ffffff"     # white card that holds the controls
+CARD_BORDER = "#bcd8cd"     # thin green-gray border around cards
+TITLE_BG    = "#2e8b57"     # dark green title band
+TITLE_FG    = "white"
+BOX_COLOR   = "#dcefe2"     # light green info box
+BUTTON_BG   = "#2e8b57"
+BUTTON_FG   = "white"
+LABEL_FONT  = ("Arial", 10)
+BOLD_FONT   = ("Arial", 10, "bold")
 
 # >>> PUT YOUR OWN NAME AND STUB CODE HERE (like the example screenshot) <<<
-CREATOR_LINE = "Program Created by: Your Name Here\nStub Code: 000"
+CREATOR_LINE = "Program Created by: Your Name Here  |  Stub Code: 000"
 
 DESCRIPTION = ("This tool helps you calculate reactions for beams with loads.\n"
                "You can input the beam details, loads, and distances\n"
@@ -44,7 +50,8 @@ MAX_LOADS = 10
 # ------------------------------------------------------------------ window
 root = tk.Tk()
 root.title(WINDOW_TITLE)
-root.geometry("1350x780")
+root.geometry("1280x760")
+root.minsize(1100, 640)
 root.configure(bg=BG_COLOR)
 
 screens = {}            # "start" / "input"  ->  frame
@@ -57,8 +64,35 @@ current_fig = None
 # ------------------------------------------------------------------ small tools
 def make_button(parent, text, command):
     return tk.Button(parent, text=text, command=command, bg=BUTTON_BG,
-                     fg=BUTTON_FG, font=("Arial", 10, "bold"),
-                     padx=8, pady=3, activebackground="#256e46")
+                     fg=BUTTON_FG, font=BOLD_FONT, padx=10, pady=6, bd=0,
+                     activebackground="#256e46", activeforeground="white",
+                     cursor="hand2")
+
+
+def make_card(parent):
+    """A white panel with a thin border and inner padding."""
+    return tk.Frame(parent, bg=CARD_BG, highlightbackground=CARD_BORDER,
+                    highlightthickness=1, padx=22, pady=16)
+
+
+def make_row(parent):
+    """One horizontal line inside a card."""
+    row = tk.Frame(parent, bg=CARD_BG)
+    row.pack(fill="x", pady=3)
+    return row
+
+
+def make_label(parent, text, width=16):
+    return tk.Label(parent, text=text, bg=CARD_BG, fg="#333333",
+                    font=LABEL_FONT, width=width, anchor="e")
+
+
+def make_entry(parent, width=10):
+    return tk.Entry(parent, width=width, font=LABEL_FONT, relief="solid", bd=1)
+
+
+def separator(parent):
+    tk.Frame(parent, bg=CARD_BORDER, height=1).pack(fill="x", pady=8)
 
 
 def show_screen(name):
@@ -80,16 +114,22 @@ def text_to_number(text):
 def build_start_screen():
     frame = tk.Frame(root, bg=BG_COLOR)
 
-    tk.Label(frame, text="Parallel Forces", font=("Arial", 30, "bold"),
-             bg=BOX_COLOR, fg="#1b4d2e", padx=20, pady=6).pack(pady=(70, 25))
+    card = make_card(frame)
+    card.pack(expand=True)                  # whole card sits in the middle
 
-    tk.Label(frame, text=DESCRIPTION, font=("Arial", 13), bg=BOX_COLOR,
-             fg="#123f24", justify="center", padx=18, pady=10).pack(pady=(0, 30))
+    tk.Label(card, text="PARALLEL FORCES", font=("Arial", 26, "bold"),
+             bg=TITLE_BG, fg=TITLE_FG, padx=26, pady=8).pack(pady=(4, 12))
 
-    make_button(frame, "Start", lambda: show_screen("input")).pack()
+    tk.Label(card, text="Support Reaction Solver", font=("Arial", 13, "bold"),
+             bg=CARD_BG, fg="#1b4d2e").pack(pady=(0, 10))
 
-    tk.Label(frame, text=CREATOR_LINE, font=("Arial", 16), bg=BOX_COLOR,
-             fg="#1b4d2e", justify="center", padx=16, pady=8).pack(side="bottom", pady=30)
+    tk.Label(card, text=DESCRIPTION, font=LABEL_FONT, bg=BOX_COLOR,
+             fg="#123f24", justify="center", padx=16, pady=10).pack(pady=(0, 16))
+
+    make_button(card, "S T A R T", lambda: show_screen("input")).pack(pady=(0, 4))
+
+    tk.Label(frame, text=CREATOR_LINE, font=("Arial", 10),
+             bg=BG_COLOR, fg="#4a6b5c").pack(side="bottom", pady=10)
 
     screens["start"] = frame
 
@@ -101,53 +141,82 @@ def build_input_screen():
 
     frame = tk.Frame(root, bg=BG_COLOR)
 
-    # ---------------- left panel : all the inputs ----------------
-    left = tk.Frame(frame, bg=BG_COLOR)
-    left.pack(side="left", fill="y", padx=25, pady=20)
+    # ---------- left : control card, centered in its column ----------
+    holder = tk.Frame(frame, bg=BG_COLOR)
+    holder.pack(side="left", fill="y", padx=(60, 12), pady=18)
 
-    row = tk.Frame(left, bg=BG_COLOR); row.pack(fill="x", pady=3)
-    tk.Label(row, text="Beam Length (m):", bg=BG_COLOR, width=16,
-             anchor="e").pack(side="left")
-    beam_len_entry = tk.Entry(row, width=10); beam_len_entry.pack(side="left", padx=6)
+    card = make_card(holder)
+    card.pack(expand=True)                  # card centered vertically
 
-    row = tk.Frame(left, bg=BG_COLOR); row.pack(fill="x", pady=3)
-    tk.Label(row, text="Number of Loads:", bg=BG_COLOR, width=16,
-             anchor="e").pack(side="left")
-    num_loads_entry = tk.Entry(row, width=10); num_loads_entry.pack(side="left", padx=6)
+    tk.Label(card, text="BEAM DATA", font=BOLD_FONT,
+             bg=CARD_BG, fg="#1b4d2e").pack(anchor="w", pady=(0, 6))
+
+    row = make_row(card)
+    make_label(row, "Beam Length (m):").pack(side="left")
+    beam_len_entry = make_entry(row); beam_len_entry.pack(side="left", padx=6)
+
+    row = make_row(card)
+    make_label(row, "Number of Loads:").pack(side="left")
+    num_loads_entry = make_entry(row); num_loads_entry.pack(side="left", padx=6)
     num_loads_entry.insert(0, "0")
     make_button(row, "Set Loads", set_loads).pack(side="left", padx=6)
 
-    load_area = tk.Frame(left, bg=BG_COLOR)      # the load rows appear here
-    load_area.pack(fill="x", pady=6)
+    load_area = tk.Frame(card, bg=CARD_BG)   # load rows appear here
+    load_area.pack(fill="x", pady=4)
 
-    row = tk.Frame(left, bg=BG_COLOR); row.pack(fill="x", pady=3)
-    tk.Label(row, text="R1 Position (m):", bg=BG_COLOR, width=16,
-             anchor="e").pack(side="left")
-    r1_entry = tk.Entry(row, width=10); r1_entry.pack(side="left", padx=6)
+    separator(card)
 
-    row = tk.Frame(left, bg=BG_COLOR); row.pack(fill="x", pady=3)
-    tk.Label(row, text="R2 Position (m):", bg=BG_COLOR, width=16,
-             anchor="e").pack(side="left")
-    r2_entry = tk.Entry(row, width=10); r2_entry.pack(side="left", padx=6)
+    row = make_row(card)
+    make_label(row, "R1 Position (m):").pack(side="left")
+    r1_entry = make_entry(row); r1_entry.pack(side="left", padx=6)
 
-    tk.Label(left, text="(leave R1 / R2 blank to use 0 and the beam length)",
-             bg=BG_COLOR, fg="#555555", font=("Arial", 9)).pack(anchor="w", pady=(0, 8))
+    row = make_row(card)
+    make_label(row, "R2 Position (m):").pack(side="left")
+    r2_entry = make_entry(row); r2_entry.pack(side="left", padx=6)
 
-    buttons = tk.Frame(left, bg=BG_COLOR); buttons.pack(pady=4)
-    make_button(buttons, "Calculate Reactions", calculate_reactions).pack(side="left", padx=4)
-    make_button(buttons, "Show Steps", show_steps).pack(side="left", padx=4)
-    make_button(buttons, "Back", lambda: show_screen("start")).pack(side="left", padx=4)
-    make_button(buttons, "Clear", clear_all).pack(side="left", padx=4)
+    tk.Label(card, text="leave R1 / R2 blank to use 0 and the beam length",
+             font=("Arial", 8, "italic"), bg=CARD_BG,
+             fg="#777777").pack(anchor="w", pady=(2, 8))
 
-    result_label = tk.Label(left, text="", bg=BG_COLOR, fg="#0b3d91",
-                            font=("Arial", 14, "bold"), justify="center")
-    result_label.pack(pady=(12, 4))
+    # buttons in a tidy 2 x 2 grid
+    buttons = tk.Frame(card, bg=CARD_BG)
+    buttons.pack(fill="x", pady=4)
+    buttons.columnconfigure(0, weight=1)
+    buttons.columnconfigure(1, weight=1)
+    make_button(buttons, "Calculate Reactions",
+                calculate_reactions).grid(row=0, column=0, sticky="ew",
+                                          padx=(0, 4), pady=2)
+    make_button(buttons, "Show Steps", show_steps).grid(row=0, column=1,
+                                                        sticky="ew",
+                                                        padx=(4, 0), pady=2)
+    make_button(buttons, "Clear", clear_all).grid(row=1, column=0, sticky="ew",
+                                                  padx=(0, 4), pady=2)
+    make_button(buttons, "Back",
+                lambda: show_screen("start")).grid(row=1, column=1, sticky="ew",
+                                                   padx=(4, 0), pady=2)
 
-    # ---------------- right panel : the diagram ----------------
-    diagram_panel = tk.Frame(frame, bg="white")
-    diagram_panel.pack(side="left", fill="both", expand=True, padx=(0, 15), pady=15)
+    separator(card)
+
+    result_label = tk.Label(card, text="", bg=CARD_BG, fg="#0b3d91",
+                            font=("Arial", 13, "bold"), justify="center")
+    result_label.pack(pady=(6, 2))
+
+    # ---------- right : diagram panel ----------
+    diagram_panel = tk.Frame(frame, bg="white", highlightbackground=CARD_BORDER,
+                             highlightthickness=1)
+    diagram_panel.pack(side="left", fill="both", expand=True,
+                       padx=(0, 16), pady=14)
+    show_diagram_placeholder()
 
     screens["input"] = frame
+
+
+def show_diagram_placeholder():
+    """Nice message instead of an empty white area."""
+    tk.Label(diagram_panel,
+             text="The beam diagram will appear here\nafter you press Calculate Reactions.",
+             font=("Arial", 11, "italic"), bg="white", fg="#9aa5a0",
+             justify="center").pack(expand=True)
 
 
 def set_loads():
@@ -167,20 +236,22 @@ def set_loads():
         return
 
     for index in range(1, number + 1):
-        row = tk.Frame(load_area, bg=BG_COLOR)
+        row = tk.Frame(load_area, bg=CARD_BG)
         row.pack(fill="x", pady=2)
 
-        tk.Label(row, text=f"Load {index} (kN):", bg=BG_COLOR, width=12,
-                 anchor="e").pack(side="left")
-        magnitude = tk.Entry(row, width=8)
-        magnitude.pack(side="left", padx=(6, 10))
+        tk.Label(row, text=f"Load {index} (kN):", bg=CARD_BG, fg="#333333",
+                 font=LABEL_FONT, width=12, anchor="e").pack(side="left")
+        magnitude = make_entry(row, width=8)
+        magnitude.pack(side="left", padx=(6, 8))
 
-        direction = ttk.Combobox(row, values=["down", "up"], width=5, state="readonly")
+        direction = ttk.Combobox(row, values=["down", "up"], width=5,
+                                 state="readonly", font=LABEL_FONT)
         direction.set("down")
         direction.pack(side="left")
 
-        tk.Label(row, text=f"Dist {index} (m):", bg=BG_COLOR).pack(side="left", padx=(10, 0))
-        position = tk.Entry(row, width=8)
+        tk.Label(row, text=f"Dist {index} (m):", bg=CARD_BG, fg="#333333",
+                 font=LABEL_FONT).pack(side="left", padx=(10, 0))
+        position = make_entry(row, width=8)
         position.pack(side="left", padx=6)
 
         load_entries.append((magnitude, direction, position))
@@ -319,8 +390,9 @@ def show_steps():
     window.title("Calculation Steps")
     window.geometry("640x520")
     window.configure(bg=BG_COLOR)
-    text_box = tk.Text(window, font=("Consolas", 10), bg="#f7fbf9")
-    text_box.pack(fill="both", expand=True, padx=10, pady=10)
+    text_box = tk.Text(window, font=("Consolas", 10), bg="#f7fbf9",
+                       relief="solid", bd=1)
+    text_box.pack(fill="both", expand=True, padx=12, pady=12)
     text_box.insert("1.0", steps_string)
     text_box.config(state="disabled")
 
@@ -341,6 +413,7 @@ def clear_all():
     current_fig = None
     for widget in diagram_panel.winfo_children():
         widget.destroy()
+    show_diagram_placeholder()
 
 
 # ------------------------------------------------------------------ run
